@@ -7,14 +7,20 @@ import {Link} from "expo-router";
 // To initialize tailwindcss config file
 // npx tailwindcss init
 
+// () is called groups in react native
+// for example  app/root/home.tsx is shown as /root/home
+// but app/(root)/home.tsx is shown as /home
+// This allows to hide the additional segments in the url
+
+// [] is used to pass the url params to the file and change the file name dynamically
+
+// (tabs) modify the bottom navigation of the app
 
 export default function Index() {
   return (
     <View className="flex-1 justify-center items-center">
         <Text className="text-5xl text-dark-200 font-bold">Welcome!</Text>
-        
-        <Link href="/Onboarding">Onboarding</Link>
-        <Link href="/movie/avengers">Avenger Movie</Link>
+
     </View>
   );
 }
