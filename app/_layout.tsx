@@ -6,7 +6,7 @@ import "./globals.css"
 export default function RootLayout() {
   return <Stack>
 
-    {/* This is to hides the route groups header (tabs) in the tabs*/}
+    {/* This is to hides the route groups header (tabs) in the (tabs)*/}
     <Stack.Screen
         name="(tabs)"
         options={{ headerShown: false }}
