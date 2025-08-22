@@ -16,6 +16,9 @@ import {Link} from "expo-router";
 
 // (tabs) modify the bottom navigation of the app
 
+// For changing the Icon, Name of the app go to app.json
+// In app.json we can change the Icon, Name, ......
+
 export default function Index() {
   return (
     <View className="flex-1 justify-center items-center">
