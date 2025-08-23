@@ -7,6 +7,7 @@ import {useRouter} from "expo-router";
 import {use} from "react";
 import useFetch from "@/services/useFetch";
 import {fetchMovies} from "@/services/api";
+import MovieCard from "@/components/MovieCard";
 
 // Home Page
 
@@ -77,10 +78,12 @@ export default function Index() {
                             And soon there are many props.......
                         */}
 
+                        {/*For more details refer this docs "https://reactnative.dev/docs/flatlist"*/}
+
                         <FlatList
                             data={movies}
                             renderItem={({item}) => (
-                                <Text className="text-white text-sm">{item.title}</Text>
+                                <MovieCard />
                             )}
                             keyExtractor={(item) => item.id.toString()}
 
