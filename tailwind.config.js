@@ -3,8 +3,9 @@
 // Copy this file from nativewind docs site
 
 // I have added some colors to extend
+// Update the content array to include your app's source files like components, pages, etc.
 module.exports = {
-  content: ["./app/**/*.{js,ts,jsx,tsx}"],
+  content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
