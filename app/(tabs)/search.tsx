@@ -1,19 +1,20 @@
 import {ActivityIndicator, FlatList, Image, StyleSheet, Text, View} from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import {images} from "@/constants/images";
 import MovieCard from "@/components/MovieCard";
 import useFetch from "@/services/useFetch";
 import {fetchMovies} from "@/services/api";
-import {useRouter} from "expo-router";
 import {icons} from "@/constants/icons";
 import SearchBar from "@/components/SearchBar";
 
 
 const Search = () => {
 
-    const  router = useRouter();
+    const [searchQuery, setSearchQuery] = useState("");
 
-    const {data: movies, loading, error} = useFetch(() => fetchMovies({query: ""}));
+    // fetch movies from the useFetch hook
+    // query is the search term
+    const {data: movies, loading, error} = useFetch(() => fetchMovies({query: searchQuery}), false);
 
     return (
         <View className="flex-1 bg-primary">
@@ -42,7 +43,11 @@ const Search = () => {
                         </View>
 
                         <View className="my-5">
-                            <SearchBar placeholder="Search movies ..." />
+                            <SearchBar
+                                placeholder="Search movies ..."
+                                value={searchQuery}
+                                onChangeText={(text: string) => setSearchQuery(text)}
+                            />
                         </View>
 
                         {/*If the movie is loading then show the activity indicator else show the movies.*/}
@@ -57,10 +62,11 @@ const Search = () => {
                             </Text>
                         )}
 
-                        {!loading && !error && "Search Term".trim() && (movies?.length ?? 0) > 0 && (
+                        {/*If is not loading and not error and search term is not empty and there are movies then show the search results.*/}
+                        {!loading && !error && searchQuery.trim() && (movies?.length ?? 0) > 0 && (
                             <Text className="text-white">
                                 Search Results for{" "}
-                                <Text className="text-accent">Search TERM</Text>
+                                <Text className="text-accent">{searchQuery}</Text>
                             </Text>
                         )}
                     </>
