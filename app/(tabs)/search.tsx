@@ -1,9 +1,10 @@
 import {ActivityIndicator, FlatList, Image, StyleSheet, Text, View} from 'react-native'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {images} from "@/constants/images";
 import MovieCard from "@/components/MovieCard";
 import useFetch from "@/services/useFetch";
 import {fetchMovies} from "@/services/api";
+import {useRouter} from "expo-router";
 import {icons} from "@/constants/icons";
 import SearchBar from "@/components/SearchBar";
 
@@ -12,9 +13,22 @@ const Search = () => {
 
     const [searchQuery, setSearchQuery] = useState("");
 
-    // fetch movies from the useFetch hook
-    // query is the search term
-    const {data: movies, loading, error} = useFetch(() => fetchMovies({query: searchQuery}), false);
+    const {data: movies, loading, error, refetch: loadMovies, reset} = useFetch(() => fetchMovies({query: searchQuery}));
+
+    // The below code is used to search the movies
+    useEffect(() => {
+        const timeoutId = setTimeout( async() => {
+            // If the search query is not empty then load the movies else reset the movies
+            if(searchQuery.trim()){
+                await loadMovies();
+            }else{
+                reset();
+            }
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+
+    }, [searchQuery])
 
     return (
         <View className="flex-1 bg-primary">
@@ -23,6 +37,7 @@ const Search = () => {
             {/*
                 FlatList in React Native is a core component used for efficiently rendering large, scrollable lists of data.
                 ListHeaderComponent is used to render a component at the top of the list.
+                ListEmptyComponent is used to render a component when the list is empty.
             */}
             <FlatList
                 data={movies}
@@ -62,7 +77,7 @@ const Search = () => {
                             </Text>
                         )}
 
-                        {/*If is not loading and not error and search term is not empty and there are movies then show the search results.*/}
+                        {/*If the movie is not loading and not error then show the movies*/}
                         {!loading && !error && searchQuery.trim() && (movies?.length ?? 0) > 0 && (
                             <Text className="text-white">
                                 Search Results for{" "}
@@ -70,6 +85,15 @@ const Search = () => {
                             </Text>
                         )}
                     </>
+                }
+                ListEmptyComponent={
+                    !loading && !error ? (
+                        <View className="mt-10 pax-5">
+                            <Text className="text-white text-gray-500">
+                                {searchQuery.trim() ? "No results found" : "Search for movies to see results"}
+                            </Text>
+                        </View>
+                    ) : null
                 }
             />
         </View>
