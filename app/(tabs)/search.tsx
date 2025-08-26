@@ -7,6 +7,7 @@ import {fetchMovies} from "@/services/api";
 import {useRouter} from "expo-router";
 import {icons} from "@/constants/icons";
 import SearchBar from "@/components/SearchBar";
+import {updateSearchCount} from "@/services/appwrite";
 
 
 const Search = () => {
@@ -17,10 +18,18 @@ const Search = () => {
 
     // The below code is used to search the movies
     useEffect(() => {
+
         const timeoutId = setTimeout( async() => {
             // If the search query is not empty then load the movies else reset the movies
             if(searchQuery.trim()){
                 await loadMovies();
+
+                // If the movies are loaded and the first movie is not empty then update the search count
+                if ((movies?.length ?? 0) > 0 && movies?.[0]) {
+                    // This function is used to update the search count in the database
+                    updateSearchCount(searchQuery, movies[0]);
+                }
+
             }else{
                 reset();
             }
