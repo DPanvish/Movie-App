@@ -1,5 +1,8 @@
 // track the searches made by a user
 
+// The AppWrite SDK is used to interact with the Appwrite database
+// "https://cloud.appwrite.io/console/organization-68a36d71000b28e4b405"
+
 import {Client, Databases, ID, Query} from "react-native-appwrite";
 
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID;
@@ -61,5 +64,32 @@ export const updateSearchCount = async(query: string, movie: Movie) => {
     }catch(error){
         console.log(error);
         throw error;
+    }
+}
+
+/*
+* This function is used to get the trending movies from the database
+* It takes no parameters
+* It returns a promise that resolves to an array of TrendingMovie objects
+* The TrendingMovie interface is defined in the app/types.ts file
+* The TrendingMovie interface has the following properties:
+* title: string
+* poster_url: string
+* count: number
+* movie_id: string
+*  searchTerm: string
+*/
+export const getTrendingMovies = async(): Promise<TrendingMovie[] | undefined> => {
+    try{
+        // @ts-ignore
+        const result = await database.listDocuments(DATABASE_ID, TABLE_ID, [
+            Query.limit(5),
+            Query.orderDesc('count'),
+        ])
+
+        return result.documents as unknown as TrendingMovie[];
+    }catch (error){
+        console.log(error);
+        return undefined;
     }
 }
