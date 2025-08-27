@@ -16,20 +16,15 @@ const Search = () => {
 
     const {data: movies, loading, error, refetch: loadMovies, reset} = useFetch(() => fetchMovies({query: searchQuery}));
 
-    // The below code is used to search the movies
+    // The below useEffect is used to load the movies when the search query changes
     useEffect(() => {
 
+        // This is used to delay the loading of the movies
         const timeoutId = setTimeout( async() => {
+
             // If the search query is not empty then load the movies else reset the movies
             if(searchQuery.trim()){
                 await loadMovies();
-
-                // If the movies are loaded and the first movie is not empty then update the search count
-                if ((movies?.length ?? 0) > 0 && movies?.[0]) {
-                    // This function is used to update the search count in the database
-                    updateSearchCount(searchQuery, movies[0]);
-                }
-
             }else{
                 reset();
             }
@@ -38,6 +33,15 @@ const Search = () => {
         return () => clearTimeout(timeoutId);
 
     }, [searchQuery])
+
+    // The below useEffect is used to update the search count in the database when the movies are loaded
+    useEffect(() => {
+        // If the movies are loaded and the first movie is not empty then update the search count
+        if ((movies?.length ?? 0) > 0 && movies?.[0]) {
+            // This function is used to update the search count in the database
+            updateSearchCount(searchQuery, movies[0]);
+        }
+    }, [movies]);
 
     return (
         <View className="flex-1 bg-primary">
