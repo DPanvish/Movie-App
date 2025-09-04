@@ -4,9 +4,15 @@
 // "https://cloud.appwrite.io/console/organization-68a36d71000b28e4b405"
 
 import {Client, Databases, ID, Query} from "react-native-appwrite";
+import * as Application from "expo-application";
 
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID;
 const TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_TABLE_ID;
+const SAVED_TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_SAVED_TABLE_ID;
+
+// Optional: provide a simple per-device id if no auth is in use
+const DEVICE_ID = Application.getAndroidId?.() || Application.getIosIdForVendorAsync?.()?.toString?.() || "unknown-device";
+
 
 // Create a new Appwrite Client instance
 const client = new Client()
@@ -91,5 +97,39 @@ export const getTrendingMovies = async(): Promise<TrendingMovie[] | undefined> =
     }catch (error){
         console.log(error);
         return undefined;
+    }
+}
+
+
+export const saveMovie = async(movie: {id: number, title: string, poster_path?: string | null}) => {
+    try{
+        const poster_url = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "";
+
+        // The existing variable is used to check if the movie is already saved
+        // @ts-ignore
+        const existing = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("movie_id", movie.id),
+            Query.equal("device_id", DEVICE_ID),
+            Query.limit(1),
+        ]);
+
+        if(existing.documents.length > 0){
+            return existing.documents[0] as unknown as SavedMovieDoc;
+        }
+
+        // The doc variable is used to create a new document in the database
+        // @ts-ignore
+        const doc = await database.createDocument(DATABASE_ID, SAVED_TABLE_ID, ID.unique(), {
+            movie_id: movie.id,
+            title: movie.title,
+            poster_url,
+            created_at: Date.now(),
+            device_id: DEVICE_ID,
+        });
+
+        return doc as unknown as SavedMovieDoc;
+    }catch(error){
+        console.log(error);
+        throw error;
     }
 }

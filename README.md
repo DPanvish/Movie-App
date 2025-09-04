@@ -48,3 +48,38 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+---
+
+# Appwrite: saved_movies collection schema
+
+Create a collection (table) named saved_movies in your Appwrite database with the following attributes and indexes so it works with the save/list/delete helpers:
+
+Attributes (columns)
+- movie_id: integer (required)
+  - TMDB numeric movie id used for de-duplication and lookups.
+- title: string (required)
+  - Movie title stored for quick display.
+- poster_url: string (required)
+  - Pre-built TMDB poster URL. Can be an empty string when no poster is available.
+- createdAt: integer (required)
+  - Unix epoch milliseconds (number). Used for sorting newest first.
+- device_id: string (required)
+  - A per-device identifier used to scope saved movies when the app has no auth.
+
+Recommended indexes
+- by_movie_device (key index) on [movie_id, device_id]
+  - Speeds up queries like: Query.equal("movie_id", <id>), Query.equal("device_id", <deviceId>), Query.limit(1).
+- by_device_createdAt (key index) on [device_id, createdAt]
+  - Speeds up listSavedMovies: Query.equal("device_id", <deviceId>), Query.orderDesc("createdAt").
+- Optional: Make by_movie_device a unique index to enforce one saved record per movie per device.
+
+Permissions
+- If you rely on device_id scoping (no user auth), you can set collection-level permissions to allow reads and writes for anyone, or use an API key. In production, prefer authenticated users and store user_id instead of device_id.
+
+Environment variables needed
+- EXPO_PUBLIC_APPWRITE_SAVED_TABLE_ID: The collection ID for saved_movies.
+- EXPO_PUBLIC_APPWRITE_DATABASE_ID: Your Appwrite database ID.
+
+Types in code
+- The SavedMovieDoc interface in interfaces/interfaces.d.ts mirrors these attributes and is used by the client helpers.

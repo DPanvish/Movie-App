@@ -79,11 +79,14 @@ interface TrendingCardProps {
   index: number;
 }
 
-interface savedMovieDoc{
-    id: string;
-    movie_id: number;
+// Saved movie document shape in Appwrite "saved_movies" collection
+// This matches the fields used by saveMovie/listSavedMovies/isMovieSaved/deleteSavedMovieByMovieId
+// Attribute names are important: createdAt (camelCase) is used for ordering; device_id is used for scoping per-device.
+interface SavedMovieDoc {
+    $id: string;        // Appwrite doc id
+    movie_id: number;   // TMDB movie id
     title: string;
     poster_url: string;
-    created_at: string;
-    device_id?: string;
+    createdAt: number;  // Date.now()
+    device_id?: string; // optional if you use device scoping
 }
