@@ -228,6 +228,7 @@ export const isMovieSaved = async(movieId: number): Promise<boolean> => {
 
 export const listSavedMovies = async(): Promise<SavedMovieDoc[] | undefined> => {
     try{
+        // @ts-ignore
         const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
             Query.equal("device_id", DEVICE_ID),
             Query.orderDesc('created_at'),
