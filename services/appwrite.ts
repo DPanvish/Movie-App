@@ -71,7 +71,7 @@ export const updateSearchCount = async(query: string, movie: Movie) => {
         console.log(error);
         throw error;
     }
-}
+};
 
 /*
 * This function is used to get the trending movies from the database
@@ -98,7 +98,7 @@ export const getTrendingMovies = async(): Promise<TrendingMovie[] | undefined> =
         console.log(error);
         return undefined;
     }
-}
+};
 
 // save a movie to the database
 /*
@@ -144,7 +144,7 @@ export const saveMovie = async(movie: {id: number, title: string, poster_path?: 
         console.log(error);
         throw error;
     }
-}
+};
 
 
 // delete a movie from the database
@@ -212,4 +212,30 @@ export const isMovieSaved = async(movieId: number): Promise<boolean> => {
         console.log(error);
         throw error;
     }
-}
+};
+
+// list all saved movies
+/*
+* This function is used to list all saved movies from the database
+* It takes no parameters
+* It returns a promise that resolves to an array of SavedMovieDoc objects
+* The SavedMovieDoc interface is defined in the app/types.ts file
+* The SavedMovieDoc interface has the following properties:
+* movie_id: number
+* title: string
+* poster_url: string
+ */
+
+export const listSavedMovies = async(): Promise<SavedMovieDoc[] | undefined> => {
+    try{
+        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("device_id", DEVICE_ID),
+            Query.orderDesc('created_at'),
+        ]);
+
+        return res.documents as unknown as SavedMovieDoc[];
+    }catch(error){
+        console.log(error);
+        return [];
+    }
+};
