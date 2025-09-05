@@ -145,3 +145,42 @@ export const saveMovie = async(movie: {id: number, title: string, poster_path?: 
         throw error;
     }
 }
+
+
+// delete a movie from the database
+/*
+* This function is used to delete a movie from the database
+* It takes a movieId as a parameter
+* It returns a promise that resolves to a boolean value
+* The movieId parameter is the ID of the movie to be deleted
+* The function first checks if the movie is already saved in the database
+* If the movie is found, it deletes the document from the database
+* If the movie is not found, it returns false
+* The function uses the database.listDocuments method to retrieve the documents from the database
+* The function uses the database.deleteDocument method to delete the document
+* The function returns a promise that resolves to a boolean value
+*/
+
+export const deleteSavedMoivie = async(movieId: number) => {
+    try{
+        // check if the movie is already saved in the database
+        // @ts-ignore
+        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("movie_id", movieId),
+            Query.equal("device_id", DEVICE_ID),
+            Query.limit(1),
+        ]);
+
+        if(res.documents.length === 0){
+            return false;
+        }
+
+        // delete the document from the database
+        // @ts-ignore
+        await database.deleteDocument(DATABASE_ID, SAVED_TABLE_ID, res.documents[0].$id);
+        return true;
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+};
