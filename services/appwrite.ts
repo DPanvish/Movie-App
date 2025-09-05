@@ -100,7 +100,19 @@ export const getTrendingMovies = async(): Promise<TrendingMovie[] | undefined> =
     }
 }
 
-
+// save a movie to the database
+/*
+* This function is used to save a movie to the database
+* It takes a movie object as a parameter
+* It returns a promise that resolves to a SavedMovieDoc object
+* The SavedMovieDoc interface is defined in the app/types.ts file
+* The SavedMovieDoc interface has the following properties:
+* movie_id: number
+* title: string
+* poster_url: string
+* created_at: number
+* device_id: string
+*/
 export const saveMovie = async(movie: {id: number, title: string, poster_path?: string | null}) => {
     try{
         const poster_url = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "";
