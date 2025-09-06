@@ -1,9 +1,10 @@
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import React from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {router, useLocalSearchParams} from "expo-router";
 import useFetch from "@/services/useFetch";
 import {fetchMovieDetails} from "@/services/api";
 import {icons} from "@/constants/icons";
+import {isMovieSaved} from "@/services/appwrite";
 
 // Movie interface is used to define the structure of the movie object. Which is present in the interface.ts
 interface MovieInfoProps{
@@ -27,8 +28,37 @@ const MovieDetails = () => {
     // useLocalSearchParams is used to get the movie id from the url
     const {id} = useLocalSearchParams();
 
+    // useMemo is used to memoize the movieId variable
+    const movieId = useMemo(() => Number(id), [id]);
+
     // useFetch is used to fetch the movie details from the api
     const {data: movie, loading} = useFetch(() => fetchMovieDetails(id as string));
+
+    const [saved, setSaved] = useState(false);
+    const [busy, setBusy] = useState(false);
+
+    // useEffect is used to check if the movie is saved in the database
+    useEffect(() => {
+        let mounted = true;
+        (async() => {
+            if(!movieId){
+                return;
+            }
+
+            // Check if the movie is saved in the database
+            const s = await isMovieSaved(movieId);
+
+            // If the movie is saved in the database then set the saved state to true
+            if(mounted){
+                setSaved(s);
+            }
+        })();
+
+        // Cleanup function to set the mounted state to false when the component unmounts
+        return () => {
+            mounted = false;
+        };
+    }, [movieId]);
 
     return (
         <View className="flex-1 bg-primary">
