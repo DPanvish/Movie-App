@@ -4,7 +4,7 @@ import {router, useLocalSearchParams} from "expo-router";
 import useFetch from "@/services/useFetch";
 import {fetchMovieDetails} from "@/services/api";
 import {icons} from "@/constants/icons";
-import {isMovieSaved} from "@/services/appwrite";
+import {deleteSavedMovie, isMovieSaved, saveMovie} from "@/services/appwrite";
 
 // Movie interface is used to define the structure of the movie object. Which is present in the interface.ts
 interface MovieInfoProps{
@@ -60,9 +60,35 @@ const MovieDetails = () => {
         };
     }, [movieId]);
 
+    // toggleSave is used to toggle the save state of the movie
+    const toggleSave = async() => {
+        // If the movie is not loaded, then return
+        if(!movie){
+            return;
+        }
+
+        try{
+            setBusy(true);
+
+            // If the movie is saved, then delete it from the database else save it to the database
+            // else save it to the database
+            if(saved){
+                await deleteSavedMovie(movie.id);
+                setSaved(false);
+            }else{
+                await saveMovie({id: movie.id, title: movie.title, poster_path: movie.poster_path});
+                setSaved(true)
+            }
+        }catch(err){
+            console.log("Toggle save error: ", err);
+        }finally {
+            setBusy(false);
+        }
+    }
+
     return (
         <View className="flex-1 bg-primary">
-            <ScrollView contentContainerStyle={{paddingBottom: 80}}>
+            <ScrollView contentContainerStyle={{paddingBottom: 150}}>
                 <View>
                     <Image source={{uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`}} className="w-full h-[550px]"/>
                 </View>
@@ -93,9 +119,27 @@ const MovieDetails = () => {
                 </View>
             </ScrollView>
 
+            {/* Back button */}
             <TouchableOpacity className="absolute bottom-5 left-0 right-0 mx-5 bg-accent rounded-full py-3.5 flex flex-row items-center justify-center z-50" onPress={router.back}>
                 <Image source={icons.arrow} className="size-5 mr-1 mt-0.5 rotate-180" tintColor="#fff" />
                 <Text className="text-white font-semibold text-base">Go back</Text>
+            </TouchableOpacity>
+
+            {/* Save/Unsave button */}
+            <TouchableOpacity
+                disabled={busy || !movie}
+                onPress={toggleSave}
+                className="absolute bottom-20 left-0 right-0 mx-5 bg-dark-100 rounded-full py-3.5 flex flex-row items-center justify-center z-50"
+            >
+                <Image
+                    source={icons.save}
+                    className="size-5 mr-2"
+                    tintColor={saved ? "#22c55e" : "#fff"}
+                />
+
+                <Text className="text-white font-semibold text-base">
+                    {saved ? "Unsave" : "Save"}
+                </Text>
             </TouchableOpacity>
         </View>
     )
