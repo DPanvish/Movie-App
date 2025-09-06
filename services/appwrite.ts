@@ -161,7 +161,7 @@ export const saveMovie = async(movie: {id: number, title: string, poster_path?: 
 * The function returns a promise that resolves to a boolean value
 */
 
-export const deleteSavedMoivie = async(movieId: number) => {
+export const deleteSavedMovie = async(movieId: number) => {
     try{
         // check if the movie is already saved in the database
         // @ts-ignore
