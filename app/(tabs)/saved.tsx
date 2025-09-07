@@ -1,4 +1,4 @@
-import {FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback} from 'react';
 import {icons} from "@/constants/icons";
 import {useRouter} from "expo-router";
@@ -53,28 +53,32 @@ const Saved = () => {
     );
 
     return (
-        <View className="bg-primary flex-1 px-10 pt-10">
-            <Text className="text-white text-xl font-bold mb-4">Saved Movies</Text>
+        <View className="bg-primary flex-1">
+            <Image source={images.bg} className="absolute w-full z-0"/>
+            <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} contentContainerStyle={{minHeight: "100%", paddingBottom: 10}}>
+                <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
+                <Text className="text-white text-xl font-bold mb-4">Saved Movies</Text>
 
-            {error ? (
-                <Text className="text-red-400">Failed to load saved movies</Text>
-            ) : (
-                <FlatList
-                    data={savedMovies ?? []}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.$id}
-                    contentContainerStyle={{paddingBottom: 24}}
-                    refreshControl={
-                        <RefreshControl refreshing={loading} onRefresh={refetch} tintColor="#fff" />
-                    }
-                    ListEmptyComponent={!loading ? (
-                        <View className="flex-1 items-center mt-20">
-                            <Image source={icons.save} className="size-8 mb-3" tintColor="#9ca3af" />
-                            <Text className="text-gray-400">No saved movies yet</Text>
-                        </View>
-                    ) : null}
-                />
-            )}
+                {error ? (
+                    <Text className="text-red-400">Failed to load saved movies</Text>
+                ) : (
+                    <FlatList
+                        data={savedMovies ?? []}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.$id}
+                        contentContainerStyle={{paddingBottom: 24}}
+                        refreshControl={
+                            <RefreshControl refreshing={loading} onRefresh={refetch} tintColor="#fff" />
+                        }
+                        ListEmptyComponent={!loading ? (
+                            <View className="flex-1 items-center mt-20">
+                                <Image source={icons.save} className="size-8 mb-3" tintColor="#9ca3af" />
+                                <Text className="text-gray-400">No saved movies yet</Text>
+                            </View>
+                        ) : null}
+                    />
+                )}
+            </ScrollView>
         </View>
     );
 }

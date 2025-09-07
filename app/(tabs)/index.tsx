@@ -49,7 +49,7 @@ export default function Index() {
 
   return (
     <View className="flex-1 bg-primary">
-        <Image source={images.bg} className="absolute w-full z-0"/>
+
 
         {/*To add the scroll effect we to type all the content inside the ScrollView. It is similar to view but scroll is added*/}
         {/*showVerticalScrollIndicator={false} hides the scrollbar*/}
