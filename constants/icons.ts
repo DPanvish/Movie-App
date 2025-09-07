@@ -6,6 +6,7 @@ import save from "@/assets/icons/save.png";
 import star from "@/assets/icons/star.png";
 import play from "@/assets/icons/play.png";
 import arrow from "@/assets/icons/arrow.png";
+import trash from "@/assets/icons/trash.png";
 
 // Export the icons for easier use
 
@@ -18,4 +19,5 @@ export const icons = {
   star,
   play,
   arrow,
+    trash,
 };

@@ -1,9 +1,10 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback} from 'react';
 import {icons} from "@/constants/icons";
 import {useRouter} from "expo-router";
 import useFetch from "@/services/useFetch";
 import {deleteSavedMovie, listSavedMovies} from "@/services/appwrite";
+import {images} from "@/constants/images";
 
 const Saved = () => {
     const router = useRouter();
@@ -22,15 +23,60 @@ const Saved = () => {
         }catch(error){
             console.log("Error deleting movie: ", error);
         }
-    }, [refetch])
-    return (
-        <View className="bg-primary flex-1 px-10">
-            <View className="flex justify-center items-center flex-1 flex-col gap-5">
-                <Image source={icons.save} className="size-10" tintColor="#fff" />
-                <Text className="text-gray-500 text-base">Save</Text>
+    }, [refetch]);
+
+    const renderItem = ({item}: {item: SavedMovieDoc}) => (
+        <TouchableOpacity
+            className="flex-row items-center bg-dark-100 rounded-xl p-3 mb-3"
+            onPress={() => onOpenMovie(item.movie_id)}
+            activeOpacity={0.8}
+        >
+            {/* if the movie has poster_url then show the image else show the placeholder image */}
+            {!!item.poster_url && (
+                <Image source={{uri: item.poster_url}} className="w-14 h-20 rounded-lg mr-3" />
+            )}
+
+            <View className="flex-1">
+                <Text className="text-white font-semibold numberOfLines={1}">{item.title}</Text>
+                <Text className="text-light-200 text-xs mt-1">
+                    Saved {new Date(item.createdAt).toLocaleDateString()}
+                </Text>
             </View>
+
+            <TouchableOpacity
+                className="p-2"
+                onPress={() => onDelete(item.movie_id)}
+            >
+                <Image source={icons.trash ?? icons.save} className="size-5" tintColor="#f87171" />
+            </TouchableOpacity>
+        </TouchableOpacity>
+    );
+
+    return (
+        <View className="bg-primary flex-1 px-10 pt-10">
+            <Text className="text-white text-xl font-bold mb-4">Saved Movies</Text>
+
+            {error ? (
+                <Text className="text-red-400">Failed to load saved movies</Text>
+            ) : (
+                <FlatList
+                    data={savedMovies ?? []}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.$id}
+                    contentContainerStyle={{paddingBottom: 24}}
+                    refreshControl={
+                        <RefreshControl refreshing={loading} onRefresh={refetch} tintColor="#fff" />
+                    }
+                    ListEmptyComponent={!loading ? (
+                        <View className="flex-1 items-center mt-20">
+                            <Image source={icons.save} className="size-8 mb-3" tintColor="#9ca3af" />
+                            <Text className="text-gray-400">No saved movies yet</Text>
+                        </View>
+                    ) : null}
+                />
+            )}
         </View>
-    )
+    );
 }
 export default Saved
 const styles = StyleSheet.create({})
