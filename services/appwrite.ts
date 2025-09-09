@@ -14,14 +14,6 @@ const SAVED_TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_SAVED_TABLE_ID;
 const DEVICE_ID = Application.getAndroidId?.() || Application.getIosIdForVendorAsync?.()?.toString?.() || "unknown-device";
 
 
-// Create a new Appwrite Client instance
-const client = new Client()
-    .setEndpoint("https://cloud.appwrite.io/v1")
-    .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!)
-
-// Create a new Appwrite Databases instance
-const database = new Databases(client)
-
 /*
 * This function is used to update the search count in the database
 * It takes the search query and the movie object as parameters
@@ -240,3 +232,74 @@ export const listSavedMovies = async(): Promise<SavedMovieDoc[] | undefined> => 
         return [];
     }
 };
+
+
+// Create a new Appwrite Client instance
+/*
+* This function is used to create a new Appwrite Client instance
+* It takes no parameters
+* It returns a new instance of the Appwrite Client class
+* The Appwrite Client class is used to interact with the Appwrite database
+* The Appwrite Client class has the following properties:
+* endpoint: string
+* project: string
+* database: Databases
+* account: Account
+* models: Models
+*/
+const client = new Client()
+    .setEndpoint("https://cloud.appwrite.io/v1")
+    .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!);
+
+// Create a new Appwrite Databases instance
+/*
+* This function is used to create a new Appwrite Databases instance
+* It takes the Appwrite Client instance as a parameter
+* It returns a new instance of the Appwrite Databases class
+* The Appwrite Databases class is used to interact with the Appwrite database
+* The Appwrite Databases class has the following properties:
+* endpoint: string
+* project: string
+* database: Databases
+*/
+
+const database = new Databases(client);
+
+// Create a new Appwrite Account instance
+/*
+* This function is used to create a new Appwrite Account instance
+* It takes the Appwrite Client instance as a parameter
+* It returns a new instance of the Appwrite Account class
+* The Appwrite Account class is used to interact with the Appwrite account
+* The Appwrite Account class has the following properties:
+* endpoint: string
+ */
+
+const account = new Account(client);
+
+export type AppUser = {
+    id: string;
+    name: string;
+    email: string;
+    emailVerification?: boolean;
+    registration?: string; // date
+}
+
+// get the current user
+export const getCurrentUser = async() : Promise<AppUser | null> => {
+    try{
+        // get the current user
+        const user = await account.get();
+
+        return{
+            id: user.$id,
+            name: user.name,
+            email: user.email,
+            emailVerification: (user as any).emailVerification,
+            registration: (user as any).registration,
+        };
+    }catch(error){
+        console.log(error);
+        return null;
+    }
+}
