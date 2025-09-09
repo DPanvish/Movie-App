@@ -277,14 +277,6 @@ const database = new Databases(client);
 
 const account = new Account(client);
 
-export type AppUser = {
-    id: string;
-    name: string;
-    email: string;
-    emailVerification?: boolean;
-    registration?: string; // date
-}
-
 // get the current user
 export const getCurrentUser = async() : Promise<AppUser | null> => {
     try{
@@ -299,7 +291,36 @@ export const getCurrentUser = async() : Promise<AppUser | null> => {
             registration: (user as any).registration,
         };
     }catch(error){
-        console.log(error);
+        console.log(error); // not logged in
         return null;
     }
 }
+
+// sign up
+export const signUp = async(email: string, password: string, name?: string) => {
+    // Create an account then create session (auto-login)
+    // create an account
+    await account.create(ID.unique(), email, password, name ?? email.split("@")[0]);
+
+    // create a session
+    await account.createEmailPasswordSession(email, password);
+    return getCurrentUser();
+};
+
+// sign in
+export const signIn = async (email: string, password: string) => {
+    // Create an account then create session (auto-login)
+    await account.createEmailPasswordSession(email, password);
+    return getCurrentUser();
+};
+
+// sign out
+// delete all sessions for the current user
+// this will log the user out of all devices
+export const signOut = async() => {
+    try{
+        await account.deleteSessions();
+    }catch(error){
+        console.log(error);
+    }
+};
