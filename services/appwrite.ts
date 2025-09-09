@@ -3,7 +3,7 @@
 // The AppWrite SDK is used to interact with the Appwrite database
 // "https://cloud.appwrite.io/console/organization-68a36d71000b28e4b405"
 
-import {Client, Databases, ID, Query} from "react-native-appwrite";
+import {Client, Databases, ID, Query, Account, Models} from "react-native-appwrite";
 import * as Application from "expo-application";
 
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID;
