@@ -90,3 +90,11 @@ interface SavedMovieDoc {
     createdAt: number;  // Date.now()
     device_id?: string; // optional if you use device scoping
 }
+
+interface AppUser{
+    id: string;
+    name: string;
+    email: string;
+    emailVerification?: boolean;
+    registration?: string; // date
+}
