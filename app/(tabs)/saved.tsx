@@ -39,7 +39,7 @@ const Saved = () => {
             <View className="flex-1">
                 <Text numberOfLines={1} className="text-white font-semibold">{item.title}</Text>
                 <Text className="text-light-200 text-xs mt-1">
-                    Saved {new Date(item.createdAt).toLocaleDateString()}
+                    Saved {new Date(item.created_at).toLocaleDateString()}
                 </Text>
             </View>
 

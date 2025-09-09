@@ -87,8 +87,9 @@ interface SavedMovieDoc {
     movie_id: number;   // TMDB movie id
     title: string;
     poster_url: string;
-    createdAt: number;  // Date.now()
-    user_id: string;
+    created_at: number;
+    user_id?: string;
+    device_id?: string;
 }
 
 interface AppUser{
