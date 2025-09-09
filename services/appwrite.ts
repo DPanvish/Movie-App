@@ -92,147 +92,6 @@ export const getTrendingMovies = async(): Promise<TrendingMovie[] | undefined> =
     }
 };
 
-// save a movie to the database
-/*
-* This function is used to save a movie to the database
-* It takes a movie object as a parameter
-* It returns a promise that resolves to a SavedMovieDoc object
-* The SavedMovieDoc interface is defined in the app/types.ts file
-* The SavedMovieDoc interface has the following properties:
-* movie_id: number
-* title: string
-* poster_url: string
-* created_at: number
-* device_id: string
-*/
-export const saveMovie = async(movie: {id: number, title: string, poster_path?: string | null}) => {
-    try{
-        const poster_url = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "";
-
-        // The existing variable is used to check if the movie is already saved
-        // @ts-ignore
-        const existing = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
-            Query.equal("movie_id", movie.id),
-            Query.equal("device_id", DEVICE_ID),
-            Query.limit(1),
-        ]);
-
-        if(existing.documents.length > 0){
-            return existing.documents[0] as unknown as SavedMovieDoc;
-        }
-
-        // The doc variable is used to create a new document in the database
-        // @ts-ignore
-        const doc = await database.createDocument(DATABASE_ID, SAVED_TABLE_ID, ID.unique(), {
-            movie_id: movie.id,
-            title: movie.title,
-            poster_url,
-            created_at: Date.now(),
-            device_id: DEVICE_ID,
-        });
-
-        return doc as unknown as SavedMovieDoc;
-    }catch(error){
-        console.log(error);
-        throw error;
-    }
-};
-
-
-// delete a movie from the database
-/*
-* This function is used to delete a movie from the database
-* It takes a movieId as a parameter
-* It returns a promise that resolves to a boolean value
-* The movieId parameter is the ID of the movie to be deleted
-* The function first checks if the movie is already saved in the database
-* If the movie is found, it deletes the document from the database
-* If the movie is not found, it returns false
-* The function uses the database.listDocuments method to retrieve the documents from the database
-* The function uses the database.deleteDocument method to delete the document
-* The function returns a promise that resolves to a boolean value
-*/
-
-export const deleteSavedMovie = async(movieId: number) => {
-    try{
-        // check if the movie is already saved in the database
-        // @ts-ignore
-        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
-            Query.equal("movie_id", movieId),
-            Query.equal("device_id", DEVICE_ID),
-            Query.limit(1),
-        ]);
-
-        if(res.documents.length === 0){
-            return false;
-        }
-
-        // delete the document from the database
-        // @ts-ignore
-        await database.deleteDocument(DATABASE_ID, SAVED_TABLE_ID, res.documents[0].$id);
-        return true;
-    }catch(error){
-        console.log(error);
-        throw error;
-    }
-};
-
-
-// check if a movie is saved in the database
-/*
-* This function is used to check if a movie is saved in the database
-* It takes a movieId as a parameter
-* It returns a promise that resolves to a boolean value
-* The movieId parameter is the ID of the movie to be checked
-* The function first checks if the movie is already saved in the database
-* If the movie is found, it returns true
-* If the movie is not found, it returns false
-* The function uses the database.listDocuments method to retrieve the documents from the database
-*/
-
-export const isMovieSaved = async(movieId: number): Promise<boolean> => {
-    try{
-        // @ts-ignore
-        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
-            Query.equal("movie_id", movieId),
-            Query.equal("device_id", DEVICE_ID),
-            Query.limit(1),
-        ]);
-
-        return res.documents.length > 0;
-    }catch(error){
-        console.log(error);
-        throw error;
-    }
-};
-
-// list all saved movies
-/*
-* This function is used to list all saved movies from the database
-* It takes no parameters
-* It returns a promise that resolves to an array of SavedMovieDoc objects
-* The SavedMovieDoc interface is defined in the app/types.ts file
-* The SavedMovieDoc interface has the following properties:
-* movie_id: number
-* title: string
-* poster_url: string
- */
-
-export const listSavedMovies = async(): Promise<SavedMovieDoc[] | undefined> => {
-    try{
-        // @ts-ignore
-        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
-            Query.equal("device_id", DEVICE_ID),
-            Query.orderDesc('created_at'),
-        ]);
-
-        return res.documents as unknown as SavedMovieDoc[];
-    }catch(error){
-        console.log(error);
-        return [];
-    }
-};
-
 
 // Create a new Appwrite Client instance
 /*
@@ -307,12 +166,14 @@ export const signUp = async(email: string, password: string, name?: string) => {
     return getCurrentUser();
 };
 
+
 // sign in
 export const signIn = async (email: string, password: string) => {
     // Create an account then create session (auto-login)
     await account.createEmailPasswordSession(email, password);
     return getCurrentUser();
 };
+
 
 // sign out
 // delete all sessions for the current user
@@ -324,3 +185,221 @@ export const signOut = async() => {
         console.log(error);
     }
 };
+
+
+// require user to be logged in
+// if the user is not logged in, throw an error
+// this is used to ensure that the user is logged in before performing an action
+const requireUser = async() => {
+    const user = await getCurrentUser();
+
+    if(!user){
+        const error: any = new Error("AUTH REQUIRED");
+        error.code = "AUTH_REQUIRED";
+        throw error;
+    }
+
+    return user;
+}
+
+
+
+// save a movie to the database
+/*
+* This function is used to save a movie to the database
+* It takes a movie object as a parameter
+* It returns a promise that resolves to a SavedMovieDoc object
+* The SavedMovieDoc interface is defined in the app/types.ts file
+* The SavedMovieDoc interface has the following properties:
+* movie_id: number
+* title: string
+* poster_url: string
+* created_at: number
+* device_id: string
+*/
+export const saveMovie = async(movie: {id: number, title: string, poster_path?: string | null}) => {
+
+    // require user to be logged in
+    const user = await requireUser();
+
+    try{
+        const poster_url = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "";
+
+        // The existing variable is used to check if the movie is already saved
+        // @ts-ignore
+        const existing = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("movie_id", movie.id),
+            Query.equal("user_id", user.id),
+            Query.limit(1),
+        ]);
+
+        if(existing.documents.length > 0){
+            return existing.documents[0] as unknown as SavedMovieDoc;
+        }
+
+        // The doc variable is used to create a new document in the database
+        // @ts-ignore
+        const doc = await database.createDocument(DATABASE_ID, SAVED_TABLE_ID, ID.unique(), {
+            movie_id: movie.id,
+            title: movie.title,
+            poster_url,
+            created_at: Date.now(),
+            user_id: user.id,
+        });
+
+        return doc as unknown as SavedMovieDoc;
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+};
+
+
+// delete a movie from the database
+/*
+* This function is used to delete a movie from the database
+* It takes a movieId as a parameter
+* It returns a promise that resolves to a boolean value
+* The movieId parameter is the ID of the movie to be deleted
+* The function first checks if the movie is already saved in the database
+* If the movie is found, it deletes the document from the database
+* If the movie is not found, it returns false
+* The function uses the database.listDocuments method to retrieve the documents from the database
+* The function uses the database.deleteDocument method to delete the document
+* The function returns a promise that resolves to a boolean value
+*/
+
+export const deleteSavedMovie = async(movieId: number) => {
+
+    // require user to be logged in
+    const user = await requireUser();
+
+    try{
+        // check if the movie is already saved in the database
+        // @ts-ignore
+        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("movie_id", movieId),
+            Query.equal("user_id", user.id),
+            Query.limit(1),
+        ]);
+
+        if(res.documents.length === 0){
+            return false;
+        }
+
+        // delete the document from the database
+        // @ts-ignore
+        await database.deleteDocument(DATABASE_ID, SAVED_TABLE_ID, res.documents[0].$id);
+        return true;
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+};
+
+
+// check if a movie is saved in the database
+/*
+* This function is used to check if a movie is saved in the database
+* It takes a movieId as a parameter
+* It returns a promise that resolves to a boolean value
+* The movieId parameter is the ID of the movie to be checked
+* The function first checks if the movie is already saved in the database
+* If the movie is found, it returns true
+* If the movie is not found, it returns false
+* The function uses the database.listDocuments method to retrieve the documents from the database
+*/
+
+export const isMovieSaved = async(movieId: number): Promise<boolean> => {
+
+    // require user to be logged in
+    const user = await requireUser();
+
+    try{
+        // @ts-ignore
+        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("movie_id", movieId),
+            Query.equal("user_id", user.id),
+            Query.limit(1),
+        ]);
+
+        return res.documents.length > 0;
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+};
+
+// list all saved movies
+/*
+* This function is used to list all saved movies from the database
+* It takes no parameters
+* It returns a promise that resolves to an array of SavedMovieDoc objects
+* The SavedMovieDoc interface is defined in the app/types.ts file
+* The SavedMovieDoc interface has the following properties:
+* movie_id: number
+* title: string
+* poster_url: string
+ */
+
+export const listSavedMovies = async(): Promise<SavedMovieDoc[] | undefined> => {
+
+    // require user to be logged in
+    const user = await requireUser();
+
+    try{
+        // @ts-ignore
+        const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+            Query.equal("user_id", user.id),
+            Query.orderDesc('created_at'),
+        ]);
+
+        return res.documents as unknown as SavedMovieDoc[];
+    }catch(error){
+        console.log(error);
+        return [];
+    }
+};
+
+
+// migrate device saved to user
+/*
+* This function is used to migrate device saved to user
+* It takes no parameters
+* It returns a promise that resolves to a number
+* The number returned is the number of documents migrated
+* The function first checks if the user is logged in
+* If the user is not logged in, it returns 0
+* If the user is logged in, it retrieves all documents from the SAVED_TABLE_ID collection
+* For each document, it checks if the device_id matches the current device ID
+*/
+
+export const migrateDeviceSavedToUser = async() => {
+    const user = await getCurrentUser();
+
+    if(!user){
+        return 0;
+    }
+
+    // @ts-ignore
+    const res = await database.listDocuments(DATABASE_ID, SAVED_TABLE_ID, [
+        Query.equal("device_id", DEVICE_ID),
+    ]);
+
+    let moved = 0;
+
+    for(const doc of res.documents){
+        try{
+            // @ts-ignore
+            await database.updateDocument(DATABASE_ID, SAVED_TABLE_ID, doc.$id, {
+                user_id: user.id,
+            });
+
+            moved++;
+        }catch(error){
+            console.log(error);
+        }
+
+        return moved;
+    }
+}

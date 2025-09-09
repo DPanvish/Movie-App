@@ -88,7 +88,7 @@ interface SavedMovieDoc {
     title: string;
     poster_url: string;
     createdAt: number;  // Date.now()
-    device_id?: string; // optional if you use device scoping
+    user_id: string;
 }
 
 interface AppUser{
