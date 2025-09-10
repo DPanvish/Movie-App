@@ -3,7 +3,7 @@ import React, {useMemo, useState} from 'react'
 import {icons} from "@/constants/icons";
 import {useRouter} from "expo-router";
 import useFetch from "@/services/useFetch";
-import {getCurrentUser, signIn} from "@/services/appwrite";
+import {getCurrentUser, migrateDeviceSavedToUser, signIn, signOut, signUp} from "@/services/appwrite";
 
 const Profile = () => {
     // To navigate between screens
@@ -26,15 +26,40 @@ const Profile = () => {
         .slice(0, 2)
         .toUpperCase(), [user]);
 
+    // The below auth function is used to sign in or sign up the user
     const doAuth = async () => {
         try{
             setBusy(true);
 
             if(mode === "signin"){
                 await signIn(email.trim(), password);
+            }else{
+                await signUp(email.trim(), password, name.trim());
             }
+
+            await migrateDeviceSavedToUser().catch(() => {});
+            await refetch();
+
+            setEmail("");
+            setPassword("");
+            setName("");
         }catch(error){
             console.log("Error signing in: ", error);
+        }finally{
+            setBusy(false);
+        }
+    };
+
+    // The below signOut function is used to sign out the user
+    const doSignOut = async() => {
+        try{
+            setBusy(true);
+            await signOut();
+            await refetch();
+        }catch(error){
+            console.log("Error signing out: ", error);
+        }finally{
+            setBusy(false);
         }
     }
 
