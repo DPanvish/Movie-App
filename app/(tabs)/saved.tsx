@@ -14,8 +14,6 @@ const Saved = () => {
 
     const {data:user} = useFetch(getCurrentUser);
 
-    // When rendering date
-
     const onOpenMovie = useCallback((movieId: number) => {
         router.push(`/movies/${movieId}` as any);
     }, [router]);
@@ -71,12 +69,23 @@ const Saved = () => {
                     <View>
                         <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
                         <Text className="text-white text-xl font-bold mb-4">Saved Movies</Text>
-                        {error && (
+                        {!user && (
+                            <View className="bg-dark-100 p-3 rounded-xl mb-3">
+                                <Text className="text-white mb-2">Sign in to view your saved movies.</Text>
+                                <TouchableOpacity
+                                    className="bg-accent rounded-full py-3.5 items-center"
+                                    onPress={() => router.push("/(tabs)/profile" as any)}
+                                >
+                                    <Text className="text-white font-semibold">Go to Profile</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                        {error && user && (
                             <Text className="text-red-400 mb-2">Failed to load saved movies</Text>
                         )}
                     </View>
                 )}
-                ListEmptyComponent={!loading ? (
+                ListEmptyComponent={!loading && user ? (
                     <View className="flex-1 items-center mt-20">
                         <Image source={icons.save} className="size-8 mb-3" tintColor="#9ca3af" />
                         <Text className="text-gray-400">No saved movies yet</Text>
