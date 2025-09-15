@@ -3,7 +3,7 @@ import React, {useCallback} from 'react';
 import {icons} from "@/constants/icons";
 import {useRouter} from "expo-router";
 import useFetch from "@/services/useFetch";
-import {deleteSavedMovie, listSavedMovies} from "@/services/appwrite";
+import {deleteSavedMovie, getCurrentUser, listSavedMovies} from "@/services/appwrite";
 import {images} from "@/constants/images";
 
 const Saved = () => {
@@ -11,6 +11,10 @@ const Saved = () => {
 
     // To get the saved movies from the database
     const {data: savedMovies, loading, error, refetch} = useFetch(listSavedMovies);
+
+    const {data:user} = useFetch(getCurrentUser);
+
+    // When rendering date
 
     const onOpenMovie = useCallback((movieId: number) => {
         router.push(`/movies/${movieId}` as any);
