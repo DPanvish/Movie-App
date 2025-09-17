@@ -89,7 +89,6 @@ interface SavedMovieDoc {
     poster_url: string;
     created_at: number;
     user_id?: string;
-    device_id?: string;
 }
 
 interface AppUser{
