@@ -1,9 +1,10 @@
+// This component shows a compact movie tile with poster, title, rating, and year that links to details.
 import {View, Text, TouchableOpacity, Image} from 'react-native'
 import React from 'react'
 import {Link} from "expo-router";
 import {icons} from "@/constants/icons";
 
-// Movie interface is used to define the structure of the movie object. Which is present in the interface.ts
+// Movie interface defines the structure of movie props passed into this card.
 
 // TO DO: Use other objects of Movie and design your own movie card
 

@@ -1,3 +1,4 @@
+// This module centralizes image imports for commonly used UI icons.
 import home from "@/assets/icons/home.png";
 import search from "@/assets/icons/search.png";
 import person from "@/assets/icons/person.png";
@@ -8,7 +9,7 @@ import play from "@/assets/icons/play.png";
 import arrow from "@/assets/icons/arrow.png";
 import trash from "@/assets/icons/trash.png";
 
-// Export the icons for easier use
+// Export the icons as a single object for easy access throughout the app.
 
 export const icons = {
   home,

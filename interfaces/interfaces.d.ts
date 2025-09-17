@@ -1,3 +1,4 @@
+// This file declares TypeScript interfaces used across the app for movies, users, and saved items.
 
 // The fields of the documents
 

@@ -1,8 +1,10 @@
+// This component renders a reusable search input with a leading icon for filtering movie lists.
 import {StyleSheet, Text, View, Image, TextInput} from 'react-native'
 import React from 'react'
 import {icons} from "@/constants/icons";
 import {images} from "@/constants/images";
 
+// Props define the placeholder text and optional handlers for press and text changes.
 interface Props{
     placeholder: string;
     onPress?: () => void;
@@ -10,6 +12,7 @@ interface Props{
     onChangeText?: (text: string) => void;
 }
 
+// The SearchBar displays an icon and a TextInput styled as a rounded pill.
 const SearchBar = ({placeholder, onPress, value, onChangeText}: Props) => {
     return (
         <View className="flex-row items-center bg-dark-200 rounded-full px-5 py-4">

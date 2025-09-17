@@ -1,3 +1,4 @@
+// This hook runs an async function and exposes data/loading/error with refetch and reset helpers.
 import {useEffect, useState} from "react";
 
 /**

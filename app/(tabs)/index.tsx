@@ -1,3 +1,4 @@
+// This screen renders the Home tab with trending and latest movies plus a search entry point.
 import {ActivityIndicator, FlatList, Image, ScrollView, Text, View} from "react-native";
 import {Link} from "expo-router";
 import {images} from "@/constants/images";

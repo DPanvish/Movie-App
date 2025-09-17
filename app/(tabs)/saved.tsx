@@ -1,3 +1,4 @@
+// This screen shows the user's saved movies list with delete and navigation actions.
 import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback} from 'react';
 import {icons} from "@/constants/icons";

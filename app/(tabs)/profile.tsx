@@ -1,3 +1,4 @@
+// This screen manages user authentication and profile info with sign in/up and sign out actions.
 import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import React, {useMemo, useState} from 'react'
 import {icons} from "@/constants/icons";

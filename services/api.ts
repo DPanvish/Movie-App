@@ -1,4 +1,4 @@
-
+// This module provides helper functions to call the TMDB API for movies and details.
 /**
  * TMDB Movies API helper
  *

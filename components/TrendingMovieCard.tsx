@@ -1,3 +1,4 @@
+// This card highlights a trending movie with a poster and a large masked rank number overlay.
 import {View, Text, TouchableOpacity, Image} from 'react-native'
 import React from 'react'
 import {Link} from "expo-router";

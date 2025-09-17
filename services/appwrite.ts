@@ -1,16 +1,17 @@
-// track the searches made by a user
+// This module wraps Appwrite client calls for auth, trending/search tracking, and saved movies CRUD.
 
-// The AppWrite SDK is used to interact with the Appwrite database
-// "https://cloud.appwrite.io/console/organization-68a36d71000b28e4b405"
+// The AppWrite SDK is used to interact with the Appwrite database.
+// Console: https://cloud.appwrite.io/console
 
 import {Client, Databases, ID, Query, Account, Models} from "react-native-appwrite";
 import * as Application from "expo-application";
 
+// Environment identifiers for Appwrite resources used by this app.
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID;
 const TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_TABLE_ID;
 const SAVED_TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_SAVED_TABLE_ID;
 
-// Optional: provide a simple per-device id if no auth is in use
+// Derive a device identifier to associate local actions when not authenticated.
 const DEVICE_ID = Application.getAndroidId?.() || Application.getIosIdForVendorAsync?.()?.toString?.() || "unknown-device";
 
 
